@@ -97,7 +97,7 @@ aws iam put-role-policy \
     ]
   }'
   ```
-## 3: Create Lambda Function
+## 4: Create Lambda Function
 
 Package the code in zip file
 ```sh
@@ -135,3 +135,9 @@ aws lambda create-function \
   --description "Check the status of services at EOD" \
   --region us-east-1
 ```
+
+## 5: Test The Lambda Function
+```sh
+aws lambda invoke --function-name eod-ec2-alerts outfile.txt
+```
+Link the lambda with other events or schedule the CloudWatch event to run it periodically
