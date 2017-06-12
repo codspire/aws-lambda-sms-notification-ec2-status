@@ -11,7 +11,7 @@ Steps
 ## 1: Create a SNS Topic
 
 ```sh
-aws sns create-topic --name "eod-ec2-alerts" --output text --query TopicArn
+$ aws sns create-topic --name "eod-ec2-alerts" --output text --query TopicArn
 ```
 
 Note down the `TopicArn`
@@ -22,7 +22,7 @@ Note down the `TopicArn`
 * Substitute `<MobileNumber>` Mobile number for SMS alerts (format 12223334444)
 
 ```sh
-aws sns subscribe --topic-arn <TopicArn> --protocol sms --notification-endpoint <MobileNumber>
+$ aws sns subscribe --topic-arn <TopicArn> --protocol sms --notification-endpoint <MobileNumber>
 ```
   
 Set display name for the topic
@@ -30,13 +30,13 @@ Set display name for the topic
 * Substitute `<TopicArn>` with topic arn
 
 ```sh
-aws sns set-topic-attributes --topic-arn <TopicArn> --attribute-name DisplayName --attribute-value "AWS Alert"
+$ aws sns set-topic-attributes --topic-arn <TopicArn> --attribute-name DisplayName --attribute-value "AWS Alert"
 ```
 
 ## 3: Create Lambda Execution Role & Policies
 
 ```sh
-aws iam create-role \
+$ aws iam create-role \
   --role-name "lambda-eod-ec2-alerts-execution" \
   --assume-role-policy-document '{
       "Version": "2012-10-17",
@@ -66,7 +66,7 @@ Instead of hard coding the topic arn in the lambda function we can externalize i
 If you don't want to use the KMS, you can skip the KMS policy snippet below and specify the topic arn in the Lambda code (TOPIC_ARN)
   
 ```sh
-aws iam put-role-policy \
+$ aws iam put-role-policy \
   --role-name "lambda-eod-ec2-alerts-execution" \
   --policy-name "lambda-eod-ec2-alerts-execution-access" \
   --policy-document '{
@@ -101,7 +101,7 @@ aws iam put-role-policy \
 
 Package the code in zip file
 ```sh
-zip eod-ec2-alerts.zip eod-ec2-alerts.py
+$ zip eod-ec2-alerts.zip eod-ec2-alerts.py
 ```
 
 * Substitute `<RoleArn>` with the role arn
@@ -109,7 +109,7 @@ zip eod-ec2-alerts.zip eod-ec2-alerts.py
 * Substitute `<KMSKeyArn>` with the key arn managed through KMS
 
 ```sh
-aws lambda create-function \
+$ aws lambda create-function \
   --function-name "eod-ec2-alerts" \
   --zip-file "fileb://eod-ec2-alerts.zip" \
   --role <RoleArn> \
@@ -125,7 +125,7 @@ aws lambda create-function \
 Use below command to create lambda if  you don't want to use KMS. Make sure to specify the topic arn in the lambda code
 
 ```sh
-aws lambda create-function \
+$ aws lambda create-function \
   --function-name "eod-ec2-alerts" \
   --zip-file "fileb://eod-ec2-alerts.zip" \
   --role <RoleArn> \
@@ -138,6 +138,6 @@ aws lambda create-function \
 
 ## 5: Test The Lambda Function
 ```sh
-aws lambda invoke --function-name eod-ec2-alerts outfile.txt
+$ aws lambda invoke --function-name eod-ec2-alerts outfile.txt
 ```
 Link the lambda with other events or schedule the CloudWatch event to run it periodically
