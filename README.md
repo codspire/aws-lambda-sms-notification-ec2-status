@@ -8,29 +8,31 @@ CloudWatch Scheduled Event -> Lambda -> SNS Topic -> Mobile
 
 Steps
 
-1: Create a SNS Topic
+## 1: Create a SNS Topic
 
 ```sh
 aws sns create-topic --name "eod-ec2-alerts" --output text --query TopicArn
 ```
 
-Note down the Topic ARN
+Note down the `TopicArn`
 
-2: Create Subscription to receive SMS
+## 2: Create Subscription to receive SMS
+
+Substitute `<TopicArn>` with topic arn created in previous step
+Substitute `<MobileNumber>` Mobile number for SMS alerts (format 12223334444)
 
 ```sh
 aws sns subscribe --topic-arn <TopicArn> --protocol sms --notification-endpoint <MobileNumber>
 ```
-  <TopicArn> with topic arn created in previous step
-  <MobileNumber> Mobile number for SMS alerts (format 12223334444)
   
 Set display name for the topic
+Substitute `<TopicArn>` with topic arn
 
 ```sh
 aws sns set-topic-attributes --topic-arn <TopicArn> --attribute-name DisplayName --attribute-value "AWS Alert"
 ```
 
-2: Create Lambda Execution Role & Policies
+## 3: Create Lambda Execution Role & Policies
 
 ```sh
 aws iam create-role \
@@ -52,13 +54,20 @@ aws iam create-role \
   --query 'Role.Arn'
 ```
 
-Note down the Role ARN
+Note down the `Role.Arn`
 
+Policies to allow lambda to communicate with SNS & EC2
+Instead of hard coding the topic arn in the lambda function we can externalize it as environment variable. AWS encrypts the environment variables therefore we need to pass the custom key managed through KMS
 
+Substitute `<TopicArn>` with the topic arn
+Substitute `<KMSKeyArn>` with the key arn managed through KMS
+
+If you don't want to use the KMS, you can skip the KMS policy snippet below and specify the topic arn in the Lambda code (TOPIC_ARN)
+  
 ```sh
 aws iam put-role-policy \
-  --role-name "$lambda_execution_role_name" \
-  --policy-name "$lambda_execution_access_policy_name" \
+  --role-name "lambda-eod-ec2-alerts-execution" \
+  --policy-name "lambda-eod-ec2-alerts-execution-access" \
   --policy-document '{
     "Version": "2012-10-17",
     "Statement": [
@@ -74,16 +83,40 @@ aws iam put-role-policy \
         "Action": [
           "sns:Publish"
         ],
-        "Resource": ${topic_arn}
-      },
-	{
-		"Effect": "Allow",
-		"Action": [
-		  "kms:Encrypt",
-		  "kms:Decrypt"
-		],
-		"Resource":${kms_key_arn}
-	}
+        "Resource": <TopicArn>
+      },
+      {
+	"Effect": "Allow",
+	"Action": [
+	  "kms:Encrypt",
+	  "kms:Decrypt"
+	],
+	"Resource":<KMSKeyArn>
+       }
     ]
   }'
   ```
+## 3: Create Lambda Function
+
+Package the code in zip file
+```sh
+zip eod-ec2-alerts.zip eod-ec2-alerts.py
+```
+
+Substitute `<RoleArn>` with the role arn
+Substitute `<TopicArn>` with the topic arn
+Substitute `<KMSKeyArn>` with the key arn managed through KMS
+
+```sh
+aws lambda create-function \
+  --function-name "eod-ec2-alerts" \
+  --zip-file "fileb://eod-ec2-alerts.zip" \
+  --role <RoleArn> \
+  --handler "eod-ec2-alerts.lambda_handler" \
+  --environment '{"Variables":{"TOPIC_ARN":<TopicArn>}}' \
+  --timeout 30 \
+  --runtime python3.6 \
+  --description "Check the status of services at EOD" \
+  --kms-key-arn <KMSKeyArn> \
+  --region us-east-1
+```
