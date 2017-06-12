@@ -18,15 +18,16 @@ Note down the `TopicArn`
 
 ## 2: Create Subscription to receive SMS
 
-Substitute `<TopicArn>` with topic arn created in previous step
-Substitute `<MobileNumber>` Mobile number for SMS alerts (format 12223334444)
+* Substitute `<TopicArn>` with topic arn created in previous step
+* Substitute `<MobileNumber>` Mobile number for SMS alerts (format 12223334444)
 
 ```sh
 aws sns subscribe --topic-arn <TopicArn> --protocol sms --notification-endpoint <MobileNumber>
 ```
   
 Set display name for the topic
-Substitute `<TopicArn>` with topic arn
+
+* Substitute `<TopicArn>` with topic arn
 
 ```sh
 aws sns set-topic-attributes --topic-arn <TopicArn> --attribute-name DisplayName --attribute-value "AWS Alert"
@@ -59,8 +60,8 @@ Note down the `Role.Arn`
 Policies to allow lambda to communicate with SNS & EC2
 Instead of hard coding the topic arn in the lambda function we can externalize it as environment variable. AWS encrypts the environment variables therefore we need to pass the custom key managed through KMS
 
-Substitute `<TopicArn>` with the topic arn
-Substitute `<KMSKeyArn>` with the key arn managed through KMS
+* Substitute `<TopicArn>` with the topic arn
+* Substitute `<KMSKeyArn>` with the key arn managed through KMS
 
 If you don't want to use the KMS, you can skip the KMS policy snippet below and specify the topic arn in the Lambda code (TOPIC_ARN)
   
@@ -103,9 +104,9 @@ Package the code in zip file
 zip eod-ec2-alerts.zip eod-ec2-alerts.py
 ```
 
-Substitute `<RoleArn>` with the role arn
-Substitute `<TopicArn>` with the topic arn
-Substitute `<KMSKeyArn>` with the key arn managed through KMS
+* Substitute `<RoleArn>` with the role arn
+* Substitute `<TopicArn>` with the topic arn
+* Substitute `<KMSKeyArn>` with the key arn managed through KMS
 
 ```sh
 aws lambda create-function \
