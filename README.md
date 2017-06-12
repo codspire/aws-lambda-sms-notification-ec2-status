@@ -1,6 +1,6 @@
 # Send SMS alert with count & type of running EC2 instances
 
-I created this lambda function to send me the count and type of EC2 instances running in my account (Yes, I was burnt by leaving an EMR running after the use). 
+I created this lambda function to send me the count and type of EC2 instances running in my account *(Yes, I'm burnt few times by unused EMR clusters).
 
 Below is how it works:
 
