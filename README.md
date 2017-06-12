@@ -121,3 +121,17 @@ aws lambda create-function \
   --kms-key-arn <KMSKeyArn> \
   --region us-east-1
 ```
+
+Use below command to create lambda if  you don't want to use KMS. Make sure to specify the topic arn in the lambda code
+
+```sh
+aws lambda create-function \
+  --function-name "eod-ec2-alerts" \
+  --zip-file "fileb://eod-ec2-alerts.zip" \
+  --role <RoleArn> \
+  --handler "eod-ec2-alerts.lambda_handler" \
+  --timeout 30 \
+  --runtime python3.6 \
+  --description "Check the status of services at EOD" \
+  --region us-east-1
+```
