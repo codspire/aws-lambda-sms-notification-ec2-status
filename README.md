@@ -141,3 +141,4 @@ $ aws lambda create-function \
 $ aws lambda invoke --function-name eod-ec2-alerts outfile.txt
 ```
 Link the lambda with other events or schedule the CloudWatch event to run it periodically
+
