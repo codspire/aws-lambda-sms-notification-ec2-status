@@ -142,3 +142,4 @@ $ aws lambda invoke --function-name eod-ec2-alerts outfile.txt
 ```
 Link the lambda with other events or schedule the CloudWatch event to run it periodically
 
+![Sample Text Message](https://raw.githubusercontent.com/codspire/aws-lambda-sms-notification-ec2-status/master/Screenshot_2017-06-21-17-13-16.png)
