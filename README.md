@@ -30,7 +30,9 @@ Set display name for the topic
 * Substitute `<TopicArn>` with topic arn
 
 ```sh
-$ aws sns set-topic-attributes --topic-arn <TopicArn> --attribute-name DisplayName --attribute-value "AWS Alert"
+$ aws sns set-topic-attributes --topic-arn <TopicArn> \
+--attribute-name DisplayName \
+--attribute-value "AWS Alert"
 ```
 
 ## 3: Create Lambda Execution Role & Policies
